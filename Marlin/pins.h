@@ -2283,7 +2283,7 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 
 #define X_STEP_PIN 37
 #define X_DIR_PIN 48
-#define X_MIN_PIN 12
+#define X_MIN_PIN -1 //12
 #define X_MAX_PIN 24
 #define X_ENABLE_PIN 29
 #define X_MS1_PIN 40
@@ -2291,7 +2291,7 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 
 #define Y_STEP_PIN 36
 #define Y_DIR_PIN 49
-#define Y_MIN_PIN 11
+#define Y_MIN_PIN -1 //11
 #define Y_MAX_PIN 23
 #define Y_ENABLE_PIN 28
 #define Y_MS1_PIN 69
@@ -2300,7 +2300,7 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 #define Z_STEP_PIN 35
 #define Z_DIR_PIN 47
 #define Z_MIN_PIN 10
-#define Z_MAX_PIN 30
+#define Z_MAX_PIN -1 //30
 #define Z_ENABLE_PIN 27
 #define Z_MS1_PIN 68
 #define Z_MS2_PIN 67
@@ -2334,14 +2334,14 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 #define E1_MS2_PIN 64
 
 #define DIGIPOTSS_PIN 38
-#define DIGIPOT_CHANNELS {4,5,3,0,1} // X Y Z E0 E1 digipot channels to stepper driver mapping
+#define DIGIPOT_CHANNELS {4, 5, 3, 0, 1} // X Y Z E0 E1 digipot channels to stepper driver mapping
 
 #define SDPOWER            -1
 #define SDSS               53
 #define LED_PIN            13
 #define FAN_PIN            -1
-#define EXTRUDER_FAN_PIN 8
-#define PS_ON_PIN          4
+#define EXTRUDER_FAN_PIN    8
+#define PS_ON_PIN           4
 #define KILL_PIN           -1 //80 with Smart Controller LCD
 #define SUICIDE_PIN        -1  //PIN that has to be turned on right after start, to keep power flowing.
 
