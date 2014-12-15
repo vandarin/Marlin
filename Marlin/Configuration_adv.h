@@ -273,7 +273,12 @@
 #define MICROSTEP_MODES {16,16,16,16,16} // [1,2,4,8,16]
 
 // Motor Current setting (Only functional when motor driver current ref pins are connected to a digital trimpot on supported boards)
-#define DIGIPOT_MOTOR_CURRENT {135,135,135,135,135} // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
+// #define DIGIPOT_MOTOR_CURRENT {135,135,135,135,135} // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
+#define DIGIPOT_MOTOR_CURRENT { 135, 135, 185, 135, 135 } // Phoenix 01
+// #define DIGIPOT_MOTOR_CURRENT { 115, 115, 115, 115, 115 } // Phoenix 05
+// #define DIGIPOT_MOTOR_CURRENT { 100, 100, 100, 100, 100 } // Phoenix 06
+// #define DIGIPOT_MOTOR_CURRENT { 185, 185, 185, 185, 185 } // Phoenix 07
+// #define DIGIPOT_MOTOR_CURRENT { 135, 60, 60, 60, 60 } // Phoenix 06
 
 // uncomment to enable an I2C based DIGIPOT like on the Azteeg X3 Pro
 //#define DIGIPOT_I2C
@@ -289,7 +294,7 @@
 //#define CHDK 4        //Pin for triggering CHDK to take a picture see how to use it here http://captain-slow.dk/2014/03/09/3d-printing-timelapses/
 #define CHDK_DELAY 50 //How long in ms the pin should stay HIGH before going LOW again
 
-#define SD_FINISHED_STEPPERRELEASE false  //if sd support and the file is finished: disable steppers?
+#define SD_FINISHED_STEPPERRELEASE false //if sd support and the file is finished: disable steppers?
 #define SD_FINISHED_RELEASECOMMAND "M84 X Y Z E" // You might want to keep the z enabled so your bed stays in place.
 
 #define SDCARD_RATHERRECENTFIRST  //reverse file order of sd card menu display. Its sorted practically after the file system block order.
