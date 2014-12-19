@@ -106,7 +106,7 @@
 
 #define TEMP_SENSOR_0 1
 #define TEMP_SENSOR_1 0
-#define TEMP_SENSOR_2 1
+#define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_BED 1
 
 // This makes temp sensor 1 a redundant sensor for sensor 0. If the temperatures difference between these sensors is to high the print will be aborted.
@@ -155,7 +155,7 @@
                                   // is more then PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
   #define PID_INTEGRAL_DRIVE_MAX 255  //limit for the integral term
   #define K1 0.95 //smoothing factor within the PID
-  #define PID_dT ((OVERSAMPLENR * 8.0)/(F_CPU / 64.0 / 256.0)) //sampling period of the temperature routine
+  #define PID_dT ((OVERSAMPLENR * 10.0)/(F_CPU / 64.0 / 256.0)) //sampling period of the temperature routine
 
 // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 // Ultimaker
@@ -174,9 +174,9 @@
 //    #define  DEFAULT_Kd 440
 
 // Phoenix Ez3D
-    #define DEFAULT_Kp 10.92
-    #define DEFAULT_Ki 0.47
-    #define DEFAULT_Kd 62.82
+    #define DEFAULT_Kp 11.37
+    #define DEFAULT_Ki 0.93
+    #define DEFAULT_Kd 67.43
 #endif // PIDTEMP
 
 // Bed Temperature Control
@@ -340,7 +340,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 // Travel limits after homing
 #define X_MAX_POS 300
 #define X_MIN_POS 0
-#define Y_MAX_POS 195
+#define Y_MAX_POS 190
 #define Y_MIN_POS 0
 #define Z_MAX_POS 200
 #define Z_MIN_POS 0
@@ -374,15 +374,15 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
   // Note: this feature occupies 10'206 byte
   #ifdef AUTO_BED_LEVELING_GRID
 
-    // set the rectangle in which to probe
-    #define LEFT_PROBE_BED_POSITION 85
-    #define RIGHT_PROBE_BED_POSITION 235  //170
-    #define BACK_PROBE_BED_POSITION  230  //180
-    #define FRONT_PROBE_BED_POSITION 85
+    // set the rectangle in which to probe  -  Probing Order: (x, y)
+    #define LEFT_PROBE_BED_POSITION  50    // (left, front)
+    #define RIGHT_PROBE_BED_POSITION 240   // (right, front)
+    #define BACK_PROBE_BED_POSITION  115   // (right, back)
+    #define FRONT_PROBE_BED_POSITION 18    // (left, back)
 
      // set the number of grid points per dimension
      // I wouldn't see a reason to go above 3 (=9 probing points on the bed)
-    #define AUTO_BED_LEVELING_GRID_POINTS 2
+    #define AUTO_BED_LEVELING_GRID_POINTS 3
 
 
   #else  // not AUTO_BED_LEVELING_GRID
@@ -400,9 +400,9 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 
   // these are the offsets to the probe relative to the extruder tip (Hotend - Probe)
-  #define X_PROBE_OFFSET_FROM_EXTRUDER   -25 //-25
+  #define X_PROBE_OFFSET_FROM_EXTRUDER   -27 //-25
   #define Y_PROBE_OFFSET_FROM_EXTRUDER   -60 //-29
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER   -1.10 //-12.35
+  #define Z_PROBE_OFFSET_FROM_EXTRUDER   -2.50 //-12.35
 
   #define Z_RAISE_BEFORE_HOMING 4       // (in mm) Raise Z before homing (G28) for Probe Clearance.
                                         // Be sure you have this distance over your Z_MAX_POS in case
