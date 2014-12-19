@@ -375,10 +375,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
   #ifdef AUTO_BED_LEVELING_GRID
 
     // set the rectangle in which to probe
-    #define LEFT_PROBE_BED_POSITION 15
-    #define RIGHT_PROBE_BED_POSITION 160  //170
-    #define BACK_PROBE_BED_POSITION  150  //180
-    #define FRONT_PROBE_BED_POSITION 20
+    #define LEFT_PROBE_BED_POSITION 85
+    #define RIGHT_PROBE_BED_POSITION 235  //170
+    #define BACK_PROBE_BED_POSITION  230  //180
+    #define FRONT_PROBE_BED_POSITION 85
 
      // set the number of grid points per dimension
      // I wouldn't see a reason to go above 3 (=9 probing points on the bed)
@@ -400,16 +400,16 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 
   // these are the offsets to the probe relative to the extruder tip (Hotend - Probe)
-  #define X_PROBE_OFFSET_FROM_EXTRUDER   0 //-25
-  #define Y_PROBE_OFFSET_FROM_EXTRUDER -60 //-29
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER   0 //-12.35
+  #define X_PROBE_OFFSET_FROM_EXTRUDER   -25 //-25
+  #define Y_PROBE_OFFSET_FROM_EXTRUDER   -60 //-29
+  #define Z_PROBE_OFFSET_FROM_EXTRUDER   -1.10 //-12.35
 
   #define Z_RAISE_BEFORE_HOMING 4       // (in mm) Raise Z before homing (G28) for Probe Clearance.
                                         // Be sure you have this distance over your Z_MAX_POS in case
 
   #define XY_TRAVEL_SPEED 5000         // X and Y axis travel speed between probes, in mm/min
 
-  #define Z_RAISE_BEFORE_PROBING 15    //How much the extruder will be raised before traveling to the first probing point.
+  #define Z_RAISE_BEFORE_PROBING 10    //How much the extruder will be raised before traveling to the first probing point.
   #define Z_RAISE_BETWEEN_PROBINGS 5  //How much the extruder will be raised when traveling from between next probing points
 
   //#define Z_PROBE_SLED // turn on if you have a z-probe mounted on a sled like those designed by Charles Bell
