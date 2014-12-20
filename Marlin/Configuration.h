@@ -25,7 +25,7 @@
 // startup. Implementation of an idea by Prof Braino to inform user that any changes made to this
 // build by the user have been successfully uploaded into firmware.
 #define STRING_VERSION_CONFIG_H __DATE__ " " __TIME__ // build date and time
-#define STRING_CONFIG_H_AUTHOR "(Luis E Alvarado, Ez3D Phoenix Mod FW, Dev)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "(Luis E Alvarado, Ez3D Phoenix Mod FW, 0.0.8-beta)" // Who made the changes.
 
 // SERIAL_PORT selects which serial port should be used for communication with the host.
 // This allows the connection of wireless adapters (for instance) to non-default port pins.
@@ -106,7 +106,7 @@
 
 #define TEMP_SENSOR_0 1
 #define TEMP_SENSOR_1 0
-#define TEMP_SENSOR_2 1
+#define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_BED 1
 
 // This makes temp sensor 1 a redundant sensor for sensor 0. If the temperatures difference between these sensors is to high the print will be aborted.
@@ -155,7 +155,7 @@
                                   // is more then PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
   #define PID_INTEGRAL_DRIVE_MAX 255  //limit for the integral term
   #define K1 0.95 //smoothing factor within the PID
-  #define PID_dT ((OVERSAMPLENR * 8.0)/(F_CPU / 64.0 / 256.0)) //sampling period of the temperature routine
+  #define PID_dT ((OVERSAMPLENR * 10.0)/(F_CPU / 64.0 / 256.0)) //sampling period of the temperature routine
 
 // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 // Ultimaker
@@ -174,9 +174,9 @@
 //    #define  DEFAULT_Kd 440
 
 // Phoenix Ez3D
-    #define DEFAULT_Kp 10.92
-    #define DEFAULT_Ki 0.47
-    #define DEFAULT_Kd 62.82
+    #define DEFAULT_Kp 11.37
+    #define DEFAULT_Ki 0.93
+    #define DEFAULT_Kd 67.43
 #endif // PIDTEMP
 
 // Bed Temperature Control
@@ -340,7 +340,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 // Travel limits after homing
 #define X_MAX_POS 300
 #define X_MIN_POS 0
-#define Y_MAX_POS 195
+#define Y_MAX_POS 190
 #define Y_MIN_POS 0
 #define Z_MAX_POS 200
 #define Z_MIN_POS 0
