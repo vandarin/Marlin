@@ -2345,6 +2345,8 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 
 #define LARGE_FLASH true
 
+#define SERVO0_PIN 4 // RAMBO ext1 pin 6
+
 #define X_STEP_PIN 37
 #define X_DIR_PIN 48
 #define X_MIN_PIN -1 //12
