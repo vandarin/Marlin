@@ -329,6 +329,9 @@ bool cancel_heatup = false ;
   int meas_delay_cm = MEASUREMENT_DELAY_CM;  //distance delay setting
 #endif
 
+const char errormagic[] PROGMEM = "Error:";
+const char echomagic[] PROGMEM = "echo:";
+
 //===========================================================================
 //=============================Private Variables=============================
 //===========================================================================
@@ -402,22 +405,27 @@ void serial_echopair_P(const char *s_P, double v)
 void serial_echopair_P(const char *s_P, unsigned long v)
     { serialprintPGM(s_P); SERIAL_ECHO(v); }
 
-extern "C"{
-  extern unsigned int __bss_end;
-  extern unsigned int __heap_start;
-  extern void *__brkval;
+#ifdef SDSUPPORT
+  #include "SdFatUtil.h"
+  int freeMemory() { return SdFatUtil::FreeRam(); }
+#else
+  extern "C" {
+    extern unsigned int __bss_end;
+    extern unsigned int __heap_start;
+    extern void *__brkval;
 
-  int freeMemory() {
-    int free_memory;
+    int freeMemory() {
+      int free_memory;
 
-    if((int)__brkval == 0)
-      free_memory = ((int)&free_memory) - ((int)&__bss_end);
-    else
-      free_memory = ((int)&free_memory) - ((int)__brkval);
+      if ((int)__brkval == 0)
+        free_memory = ((int)&free_memory) - ((int)&__bss_end);
+      else
+        free_memory = ((int)&free_memory) - ((int)__brkval);
 
-    return free_memory;
+      return free_memory;
+    }
   }
-}
+#endif //!SDSUPPORT
 
 //adds an command to the main command buffer
 //thats really done in a non-safe way.
@@ -455,10 +463,20 @@ void enquecommand_P(const char *cmd)
 void setup_killpin()
 {
   #if defined(KILL_PIN) && KILL_PIN > -1
-    pinMode(KILL_PIN,INPUT);
+    SET_INPUT(KILL_PIN);
     WRITE(KILL_PIN,HIGH);
   #endif
 }
+
+// Set home pin
+void setup_homepin(void)
+{
+#if defined(HOME_PIN) && HOME_PIN > -1
+   SET_INPUT(HOME_PIN);
+   WRITE(HOME_PIN,HIGH);
+#endif
+}
+
 
 void setup_photpin()
 {
@@ -592,6 +610,7 @@ void setup()
   pinMode(SERVO0_PIN, OUTPUT);
   digitalWrite(SERVO0_PIN, LOW); // turn it off
 #endif // Z_PROBE_SLED
+  setup_homepin();
 }
 
 
@@ -1050,11 +1069,16 @@ static void run_z_probe() {
 static void do_blocking_move_to(float x, float y, float z) {
     float oldFeedRate = feedrate;
 
+    feedrate = homing_feedrate[Z_AXIS];
+
+    current_position[Z_AXIS] = z;
+    plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], feedrate/60, active_extruder);
+    st_synchronize();
+
     feedrate = XY_TRAVEL_SPEED;
 
     current_position[X_AXIS] = x;
     current_position[Y_AXIS] = y;
-    current_position[Z_AXIS] = z;
     plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], feedrate/60, active_extruder);
     st_synchronize();
 
@@ -1558,7 +1582,7 @@ void process_commands()
             destination[X_AXIS] = round(Z_SAFE_HOMING_X_POINT - X_PROBE_OFFSET_FROM_EXTRUDER);
             destination[Y_AXIS] = round(Z_SAFE_HOMING_Y_POINT - Y_PROBE_OFFSET_FROM_EXTRUDER);
             destination[Z_AXIS] = Z_RAISE_BEFORE_HOMING * home_dir(Z_AXIS) * (-1);    // Set destination away from bed
-            feedrate = XY_TRAVEL_SPEED;
+            feedrate = XY_TRAVEL_SPEED/60;
             current_position[Z_AXIS] = 0;
 
             plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
@@ -1616,7 +1640,7 @@ void process_commands()
 #ifdef SCARA
 	  calculate_delta(current_position);
       plan_set_position(delta[X_AXIS], delta[Y_AXIS], delta[Z_AXIS], current_position[E_AXIS]);
-#endif SCARA
+#endif // SCARA
 
       #ifdef ENDSTOPS_ONLY_FOR_HOMING
         enable_endstops(false);
@@ -3053,11 +3077,12 @@ Sigma_Exit:
 
           if (pin_number > -1)
           {
+            int target = LOW;
+
             st_synchronize();
 
             pinMode(pin_number, INPUT);
 
-            int target;
             switch(pin_state){
             case 1:
               target = HIGH;
@@ -3591,7 +3616,7 @@ case 404:  //M404 Enter the nominal filament width (3mm, 1.75mm ) N<3.0> or disp
         while(!lcd_clicked()){
           cnt++;
           manage_heater();
-          manage_inactivity();
+          manage_inactivity(true);
           lcd_update();
           if(cnt==0)
           {
@@ -3932,7 +3957,14 @@ void clamp_to_software_endstops(float target[3])
   if (min_software_endstops) {
     if (target[X_AXIS] < min_pos[X_AXIS]) target[X_AXIS] = min_pos[X_AXIS];
     if (target[Y_AXIS] < min_pos[Y_AXIS]) target[Y_AXIS] = min_pos[Y_AXIS];
-    if (target[Z_AXIS] < min_pos[Z_AXIS]) target[Z_AXIS] = min_pos[Z_AXIS];
+    
+    float negative_z_offset = 0;
+    #ifdef ENABLE_AUTO_BED_LEVELING
+      if (Z_PROBE_OFFSET_FROM_EXTRUDER < 0) negative_z_offset = negative_z_offset + Z_PROBE_OFFSET_FROM_EXTRUDER;
+      if (add_homing[Z_AXIS] < 0) negative_z_offset = negative_z_offset + add_homing[Z_AXIS];
+    #endif
+    
+    if (target[Z_AXIS] < min_pos[Z_AXIS]+negative_z_offset) target[Z_AXIS] = min_pos[Z_AXIS]+negative_z_offset;
   }
 
   if (max_software_endstops) {
@@ -4280,8 +4312,20 @@ void handle_status_leds(void) {
 }
 #endif
 
-void manage_inactivity()
+void manage_inactivity(bool ignore_stepper_queue/*=false*/) //default argument set in Marlin.h
 {
+	
+#if defined(KILL_PIN) && KILL_PIN > -1
+	static int killCount = 0;   // make the inactivity button a bit less responsive
+   const int KILL_DELAY = 10000;
+#endif
+
+#if defined(HOME_PIN) && HOME_PIN > -1
+   static int homeDebounceCount = 0;   // poor man's debouncing count
+   const int HOME_DEBOUNCE_DELAY = 10000;
+#endif
+   
+	
   if(buflen < (BUFSIZE-1))
     get_command();
 
@@ -4291,7 +4335,7 @@ void manage_inactivity()
   if(stepper_inactive_time)  {
     if( (millis() - previous_millis_cmd) >  stepper_inactive_time )
     {
-      if(blocks_queued() == false) {
+      if(blocks_queued() == false && ignore_stepper_queue == false) {
         disable_x();
         disable_y();
         disable_z();
@@ -4311,9 +4355,49 @@ void manage_inactivity()
   #endif
   
   #if defined(KILL_PIN) && KILL_PIN > -1
+    
+    // Check if the kill button was pressed and wait just in case it was an accidental
+    // key kill key press
+    // -------------------------------------------------------------------------------
     if( 0 == READ(KILL_PIN) )
-      kill();
+    {
+       killCount++;
+    }
+    else if (killCount > 0)
+    {
+       killCount--;
+    }
+    // Exceeded threshold and we can confirm that it was not accidental
+    // KILL the machine
+    // ----------------------------------------------------------------
+    if ( killCount >= KILL_DELAY)
+    {
+       kill();
+    }
   #endif
+
+#if defined(HOME_PIN) && HOME_PIN > -1
+    // Check to see if we have to home, use poor man's debouncer
+    // ---------------------------------------------------------
+    if ( 0 == READ(HOME_PIN) )
+    {
+       if (homeDebounceCount == 0)
+       {
+          enquecommand_P((PSTR("G28")));
+          homeDebounceCount++;
+          LCD_ALERTMESSAGEPGM(MSG_AUTO_HOME);
+       }
+       else if (homeDebounceCount < HOME_DEBOUNCE_DELAY)
+       {
+          homeDebounceCount++;
+       }
+       else
+       {
+          homeDebounceCount = 0;
+       }
+    }
+#endif
+    
   #if defined(CONTROLLERFAN_PIN) && CONTROLLERFAN_PIN > -1
     controllerFan(); //Check if fan should be turned on to cool stepper drivers down
   #endif
@@ -4370,6 +4454,14 @@ void kill()
   SERIAL_ERROR_START;
   SERIAL_ERRORLNPGM(MSG_ERR_KILLED);
   LCD_ALERTMESSAGEPGM(MSG_KILLED);
+  
+  // FMC small patch to update the LCD before ending
+  sei();   // enable interrupts
+  for ( int i=5; i--; lcd_update())
+  {
+     delay(200);	
+  }
+  cli();   // disable interrupts
   suicide();
   while(1) { /* Intentionally left empty */ } // Wait for reset
 }
