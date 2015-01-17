@@ -33,11 +33,9 @@
 #include "ultralcd.h"
 #include "temperature.h"
 #include "watchdog.h"
-#include "thermistortables.h"
 
-#ifdef HEATER_0_USES_MAX6675
-//#include <Sd2PinMap.h>
-#endif
+#include "Sd2PinMap.h"
+
 
 //===========================================================================
 //=============================public variables============================

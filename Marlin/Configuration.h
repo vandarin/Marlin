@@ -800,5 +800,6 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 
 #include "Configuration_adv.h"
+#include "thermistortables.h"
 
 #endif //__CONFIGURATION_H
